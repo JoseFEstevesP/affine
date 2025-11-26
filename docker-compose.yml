@@ -33,7 +33,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_SERVER_HOST=redis
+      - REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-redis}
       - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_DATABASE:-affine}
       - AFFINE_INDEXER_ENABLED=false
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_SERVER_HOST=redis
+      - REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-redis}
       - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_DATABASE:-affine}
       - AFFINE_INDEXER_ENABLED=false
     depends_on:
@@ -66,7 +66,7 @@ services:
     image: redis
     container_name: affine_redis
     ports:
-      - '6380:6379'
+      - '${REDIS_PORT:-6379}:6379'
     healthcheck:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
       interval: 10s
@@ -91,7 +91,14 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test:
-        ['CMD', 'pg_isready', '-U', "${DB_USERNAME}", '-d', "${DB_DATABASE:-affine}"]
+        [
+          'CMD',
+          'pg_isready',
+          '-U',
+          '${DB_USERNAME}',
+          '-d',
+          '${DB_DATABASE:-affine}',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -106,18 +113,23 @@ services:
     volumes:
       - ./backups:/backups
     environment:
-      - TZ=America/Caracas
+      - TZ=${TZ:-UTC}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=${DB_HOST:-db}
       - RETENTION_DAYS=${RETENTION_DAYS:-7}
     depends_on:
       - db
     networks:
       - app-network
     restart: always
-    command: ["sh", "-c", "sleep $${BACKUP_INTERVAL_SECONDS:-3600} && /backup-script.sh"]
+    command:
+      [
+        'sh',
+        '-c',
+        'sleep $${BACKUP_INTERVAL_SECONDS:-3600} && /backup-script.sh',
+      ]
 
 volumes:
   postgres-data:
