@@ -1,67 +1,68 @@
-# Affine with Nginx Reverse Proxy
+# Affine con Proxy Inverso de Nginx
 
-This project sets up Affine (the open-source Notion alternative) with nginx as a reverse proxy for secure HTTPS access.
+Este proyecto configura Affine (la alternativa de código abierto a Notion) con nginx como proxy inverso para acceso seguro HTTPS.
 
-## Services
+## Servicios
 
-- **nginx**: Reverse proxy with SSL termination
-- **affine-server**: Main Affine application server
-- **postgres**: PostgreSQL database for data storage
-- **redis**: Redis for caching and real-time sync
-- **db-backup**: Automated backup service for PostgreSQL
+- **nginx**: Proxy inverso con terminación SSL
+- **affine-server**: Servidor principal de la aplicación Affine
+- **postgres**: Base de datos PostgreSQL para almacenamiento de datos
+- **redis**: Redis para caché y sincronización en tiempo real
+- **db-backup**: Servicio de copias de seguridad automatizadas para PostgreSQL
 
-## Prerequisites
+## Requisitos Previos
 
 - Docker
 - Docker Compose
 
-## Setup Instructions
+## Instrucciones de Configuración
 
-1. **Configure environment variables**:
+1. **Configurar variables de entorno**:
+
    ```bash
    cp .env.example .env
-   # Edit .env with your specific configuration
+   # Edita .env con tu configuración específica
    ```
 
-2. **Generate SSL certificates**:
+2. **Generar certificados SSL**:
    ```bash
    cd nginx/ssl
    chmod +x generate_ssl.sh
    ./generate_ssl.sh
    ```
-   
-3. **Start the services**:
+3. **Iniciar los servicios**:
+
    ```bash
    docker-compose up -d
    ```
 
-4. **Access Affine**:
-   - The application will be available at `https://localhost` (or your configured server name)
-   - First time access will allow you to create an admin account
+4. **Acceder a Affine**:
+   - La aplicación estará disponible en `https://localhost` (o el nombre de servidor que configuraste)
+   - El primer acceso te permitirá crear una cuenta de administrador
 
-## Configuration Details
+## Detalles de Configuración
 
-- The nginx configuration provides SSL termination with HTTP to HTTPS redirect
-- Affine server runs on an internal port, accessed through nginx
-- PostgreSQL and Redis are configured with persistent volumes
-- Automated database backups are configured to run at specified intervals
+- La configuración de nginx proporciona terminación SSL con redirección de HTTP a HTTPS
+- El servidor de Affine funciona en un puerto interno, accedido a través de nginx
+- PostgreSQL y Redis están configurados con volúmenes persistentes
+- Las copias de seguridad automatizadas de la base de datos están configuradas para ejecutarse en intervalos específicos
 
-## Security Features
+## Características de Seguridad
 
-- SSL/TLS encryption
-- Security headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
-- Increased file upload limits (100MB)
-- WebSocket support for real-time collaboration
+- Cifrado SSL/TLS
+- Cabeceras de seguridad (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+- Límites aumentados de subida de archivos (100MB)
+- Soporte para WebSocket para colaboración en tiempo real
 
-## Customization
+## Personalización
 
-- Update `SERVER_NAME` in `.env` to your domain
-- Modify SSL certificate generation script for your specific domain/IP
-- Adjust retention days and backup intervals in `.env`
-- Modify nginx configuration in `nginx/nginx.conf` as needed
+- Actualiza `SERVER_NAME` en `.env` con tu dominio
+- Modifica el script de generación de certificados SSL para tu dominio/IP específico
+- Ajusta los días de retención e intervalos de copia de seguridad en `.env`
+- Modifica la configuración de nginx en `nginx/nginx.conf` según sea necesario
 
-## Troubleshooting
+## Resolución de Problemas
 
-- If you get errors about missing SSL certificates, run the generate_ssl.sh script first
-- Check service logs with `docker-compose logs [service_name]`
-- Ensure required ports (80, 443, 3010) are not in use by other applications
+- Si recibes errores sobre certificados SSL faltantes, ejecuta primero el script generate_ssl.sh
+- Revisa los logs de los servicios con `docker-compose logs [nombre_servicio]`
+- Asegúrate de que los puertos requeridos (80, 443, 3010) no estén siendo usados por otras aplicaciones
