@@ -4,3 +4,4 @@ affine-data
 backups
 nginx-selfsigned.crt
 nginx-selfsigned.key
+.vscode/settings.json
